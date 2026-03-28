@@ -47,5 +47,16 @@ func main() {
 		c.String(http.StatusOK, "id: %s; page: %s; name: %s; message: %s", id, page, name, message)
 	})
 
+	router.POST("/form_post", func(c *gin.Context) {
+		message := c.PostForm("message")
+		nick := c.DefaultPostForm("nick", "anonymous")
+
+		c.JSON(200, gin.H{
+			"status":  "posted",
+			"message": message,
+			"nick":    nick,
+		})
+	})
+
 	router.Run(":8080")
 }
