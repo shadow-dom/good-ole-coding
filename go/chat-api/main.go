@@ -37,16 +37,6 @@ func main() {
 		c.JSON(http.StatusCreated, gin.H{"user": name})
 	})
 
-	router.POST("/post", func(c *gin.Context) {
-		id := c.Query("id")
-		page := c.DefaultQuery("page", "0")
-		name := c.PostForm("name")
-		message := c.PostForm("message")
-
-		fmt.Printf("id: %s; page: %s; name: %s; message: %s\n", id, page, name, message)
-		c.String(http.StatusOK, "id: %s; page: %s; name: %s; message: %s", id, page, name, message)
-	})
-
 	router.POST("/form_post", func(c *gin.Context) {
 		message := c.PostForm("message")
 		nick := c.DefaultPostForm("nick", "anonymous")
@@ -59,13 +49,14 @@ func main() {
 	})
 
 	router.POST("/post", func(c *gin.Context) {
-		id := c.Query("id")
-		page := c.DefaultQuery("page", "0")
-		name := c.PostForm("name")
-		message := c.PostForm("message")
+		ids := c.QueryMap("ids")
+		names := c.PostFormMap("names")
 
-		fmt.Printf("id: %s; page: %s; name: %s; message: %s\n", id, page, name, message)
-		c.String(http.StatusOK, "id: %s; page: %s; name: %s; message: %s", id, page, name, message)
+		fmt.Printf("ids: %v; names: %v\n", ids, names)
+		c.JSON(http.StatusOK, gin.H{
+			"ids":   ids,
+			"names": names,
+		})
 	})
 
 	router.Run(":8080")
