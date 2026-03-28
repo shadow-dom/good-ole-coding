@@ -2,12 +2,42 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
-	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 )
+
+const (
+	MaxUploadSize = 13 << 10 // 13 KB
+)
+
+func uploadHandler(c *gin.Context) {
+	// Wrap the body reader so only MaxUploadSize bytes are allowed
+	c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, MaxUploadSize)
+
+	// Parse multipart form
+	if err := c.Request.ParseMultipartForm(MaxUploadSize); err != nil {
+		if _, ok := err.(*http.MaxBytesError); ok {
+			c.JSON(http.StatusRequestEntityTooLarge, gin.H{
+				"error": fmt.Sprintf("file too large (max: %d bytes)", MaxUploadSize),
+			})
+			return
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	file, _, err := c.Request.FormFile("file")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "file form required"})
+		return
+	}
+	defer file.Close()
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "upload successful",
+	})
+}
 
 func main() {
 	router := gin.Default()
@@ -63,24 +93,7 @@ func main() {
 		})
 	})
 
-	router.POST("/upload", func(c *gin.Context) {
-		// Multipart form
-		form, err := c.MultipartForm()
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-		files := form.File["files"]
-
-		for _, file := range files {
-			log.Println(file.Filename)
-
-			// Upload the file to specific dst.
-			dst := filepath.Join("./files/", filepath.Base(file.Filename))
-			c.SaveUploadedFile(file, dst)
-		}
-		c.String(http.StatusOK, fmt.Sprintf("%d files uploaded!", len(files)))
-	})
+	router.POST("/upload", uploadHandler)
 
 	router.Run(":8080")
 }
