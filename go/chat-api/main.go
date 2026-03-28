@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -22,6 +23,28 @@ func main() {
 		action := c.Param("action")
 		message := name + " is " + action
 		c.String(http.StatusOK, message)
+	})
+
+	router.GET("/welcome", func(c *gin.Context) {
+		firstname := c.DefaultQuery("firstname", "Guest")
+		lastname := c.Query("lastname") // shortcut for c.Request.URL.Query().Get("lastname")
+
+		c.String(http.StatusOK, "Hello %s %s", firstname, lastname)
+	})
+
+	router.POST("/users", func(c *gin.Context) {
+		name := c.PostForm("name")
+		c.JSON(http.StatusCreated, gin.H{"user": name})
+	})
+
+	router.POST("/post", func(c *gin.Context) {
+		id := c.Query("id")
+		page := c.DefaultQuery("page", "0")
+		name := c.PostForm("name")
+		message := c.PostForm("message")
+
+		fmt.Printf("id: %s; page: %s; name: %s; message: %s\n", id, page, name, message)
+		c.String(http.StatusOK, "id: %s; page: %s; name: %s; message: %s", id, page, name, message)
 	})
 
 	router.Run(":8080")
