@@ -11,6 +11,15 @@ const (
 	MaxUploadSize = 13 << 10 // 13 KB
 )
 
+// AuthRequired is a placeholder for your auth middleware.
+func AuthRequired() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// ... check token, session, etc.
+		fmt.Print("auth check!")
+		c.Next()
+	}
+}
+
 func loginEndpoint(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"action": "login"})
 }
@@ -115,9 +124,9 @@ func main() {
 		v1.POST("/read", readEndpoint)
 	}
 
-	// Simple group: v2
+	v2 := router.Group("/v2")
+	v2.Use(AuthRequired()) // Apply auth middleware to all v2 routes
 	{
-		v2 := router.Group("/v2")
 		v2.POST("/login", loginEndpoint)
 		v2.POST("/submit", submitEndpoint)
 		v2.POST("/read", readEndpoint)
