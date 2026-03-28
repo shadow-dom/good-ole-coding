@@ -2,13 +2,17 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	router := gin.Default()
+
+	router.MaxMultipartMemory = 8 << 20 // 8 MiB
 
 	// This handler will match /user/john but will not match /user/ or /user
 	router.GET("/user/:name", func(c *gin.Context) {
@@ -57,6 +61,22 @@ func main() {
 			"ids":   ids,
 			"names": names,
 		})
+	})
+
+	router.POST("/upload", func(c *gin.Context) {
+		// single file
+		file, err := c.FormFile("file")
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		log.Println(file.Filename)
+
+		// Upload the file to specific dst.
+		dst := filepath.Join("./files/", filepath.Base(file.Filename))
+		c.SaveUploadedFile(file, dst)
+
+		c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!", file.Filename))
 	})
 
 	router.Run(":8080")
