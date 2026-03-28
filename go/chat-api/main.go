@@ -64,19 +64,22 @@ func main() {
 	})
 
 	router.POST("/upload", func(c *gin.Context) {
-		// single file
-		file, err := c.FormFile("file")
+		// Multipart form
+		form, err := c.MultipartForm()
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		log.Println(file.Filename)
+		files := form.File["files"]
 
-		// Upload the file to specific dst.
-		dst := filepath.Join("./files/", filepath.Base(file.Filename))
-		c.SaveUploadedFile(file, dst)
+		for _, file := range files {
+			log.Println(file.Filename)
 
-		c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!", file.Filename))
+			// Upload the file to specific dst.
+			dst := filepath.Join("./files/", filepath.Base(file.Filename))
+			c.SaveUploadedFile(file, dst)
+		}
+		c.String(http.StatusOK, fmt.Sprintf("%d files uploaded!", len(files)))
 	})
 
 	router.Run(":8080")
