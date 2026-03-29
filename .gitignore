@@ -7,8 +7,8 @@ files/
 *.dll
 *.so
 *.dylib
-go.mod
-go.sum
+**/go.mod
+**/go.sum
 
 # IDE
 .vscode/
@@ -18,5 +18,5 @@ go.sum
 *~
 
 # OS
-.DS_Store
+**/.DS_Store
 Thumbs.db
