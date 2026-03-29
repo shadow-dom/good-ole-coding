@@ -32,6 +32,17 @@ type Meta struct {
 	TotalPages int `json:"total_pages,omitempty"`
 }
 
+func VersionMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		version := c.GetHeader("Accept-Version")
+		if version == "" {
+			version = "v1" // default
+		}
+		c.Set("api_version", version)
+		c.Next()
+	}
+}
+
 // OK sends a success response.
 func OK(c *gin.Context, data interface{}) {
 	c.JSON(http.StatusOK, Response{
@@ -101,6 +112,19 @@ func main() {
 	router := gin.Default()
 
 	router.MaxMultipartMemory = 8 << 20 // 8 MiB
+
+	router.Use(VersionMiddleware())
+
+	router.GET("/api/users", func(c *gin.Context) {
+		version := c.GetString("api_version")
+
+		switch version {
+		case "v2":
+			c.JSON(http.StatusOK, gin.H{"version": "v2", "data": []gin.H{}})
+		default:
+			c.JSON(http.StatusOK, gin.H{"version": "v1", "users": []string{}})
+		}
+	})
 
 	// This handler will match /user/john but will not match /user/ or /user
 	router.GET("/user/:name", func(c *gin.Context) {
