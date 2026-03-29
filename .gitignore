@@ -7,8 +7,6 @@ files/
 *.dll
 *.so
 *.dylib
-**/go.mod
-**/go.sum
 
 # IDE
 .vscode/
