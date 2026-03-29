@@ -8,6 +8,12 @@ files/
 *.so
 *.dylib
 
+# Frontend build output embedded in Go binary
+go/chat-api/frontend/
+
+# Node
+node_modules/
+
 # IDE
 .vscode/
 .idea/
