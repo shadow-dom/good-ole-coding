@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -10,6 +11,42 @@ import (
 const (
 	MaxUploadSize = 13 << 10 // 13 KB
 )
+
+// Response is the standard API envelope.
+type Response struct {
+	Success bool        `json:"success"`
+	Data    interface{} `json:"data,omitempty"`
+	Error   *ErrorInfo  `json:"error,omitempty"`
+	Meta    *Meta       `json:"meta,omitempty"`
+}
+
+type ErrorInfo struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+type Meta struct {
+	Page       int `json:"page,omitempty"`
+	PerPage    int `json:"per_page,omitempty"`
+	Total      int `json:"total,omitempty"`
+	TotalPages int `json:"total_pages,omitempty"`
+}
+
+// OK sends a success response.
+func OK(c *gin.Context, data interface{}) {
+	c.JSON(http.StatusOK, Response{
+		Success: true,
+		Data:    data,
+	})
+}
+
+// Fail sends an error response.
+func Fail(c *gin.Context, status int, code, message string) {
+	c.JSON(status, Response{
+		Success: false,
+		Error:   &ErrorInfo{Code: code, Message: message},
+	})
+}
 
 // AuthRequired is a placeholder for your auth middleware.
 func AuthRequired() gin.HandlerFunc {
@@ -116,24 +153,73 @@ func main() {
 
 	router.POST("/upload", uploadHandler)
 
-	api := router.Group("/api")
+	v1 := router.Group("/api/v1")
 	{
-		// Simple group: v1
-		{
-			v1 := api.Group("/v1")
-			v1.POST("/login", loginEndpoint)
-			v1.POST("/submit", submitEndpoint)
-			v1.POST("/read", readEndpoint)
+		v1.GET("/users", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{"version": "v1", "users": []string{}})
+		})
+	}
+
+	v2 := router.Group("/api/v2")
+	{
+		v2.GET("/users", func(c *gin.Context) {
+			// v2 returns a different shape
+			c.JSON(http.StatusOK, gin.H{
+				"version": "v2",
+				"data":    []gin.H{},
+				"meta":    gin.H{"total": 0},
+			})
+		})
+	}
+
+	router.GET("/api/users/:id", func(c *gin.Context) {
+		id := c.Param("id")
+		// Simulate a lookup
+		if id == "0" {
+			Fail(c, http.StatusNotFound, "USER_NOT_FOUND", "no user with that ID")
+			return
+		}
+		OK(c, gin.H{"id": id, "name": "Alice"})
+	})
+
+	router.GET("/api/articles", func(c *gin.Context) {
+		limit, _ := strconv.Atoi(c.DefaultQuery("limit", "20"))
+		offset, _ := strconv.Atoi(c.DefaultQuery("offset", "0"))
+
+		if limit > 100 {
+			limit = 100 // cap the page size
 		}
 
-		v2 := api.Group("/v2")
-		v2.Use(AuthRequired()) // Apply auth middleware to all v2 routes
-		{
-			v2.POST("/login", loginEndpoint)
-			v2.POST("/submit", submitEndpoint)
-			v2.POST("/read", readEndpoint)
+		// articles, total := db.ListArticles(limit, offset)
+
+		c.JSON(http.StatusOK, gin.H{
+			"success": true,
+			"data":    []gin.H{}, // articles
+			"meta": gin.H{
+				"limit":  limit,
+				"offset": offset,
+				"total":  0, // total
+			},
+		})
+	})
+
+	router.GET("/api/events", func(c *gin.Context) {
+		cursor := c.Query("cursor") // e.g. last event ID
+		limit, _ := strconv.Atoi(c.DefaultQuery("limit", "20"))
+
+		if limit > 100 {
+			limit = 100
 		}
-	}
+
+		// events, nextCursor := db.ListEvents(cursor, limit)
+		_ = cursor
+
+		c.JSON(http.StatusOK, gin.H{
+			"success":     true,
+			"data":        []gin.H{}, // events
+			"next_cursor": "",        // nextCursor (empty string means no more pages)
+		})
+	})
 
 	router.Run(":8080")
 }
