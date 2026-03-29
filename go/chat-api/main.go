@@ -1,7 +1,7 @@
 package main
 
 import (
-	"net/http"
+	"chat-api/routes"
 
 	"github.com/gin-gonic/gin"
 )
@@ -9,9 +9,9 @@ import (
 func main() {
 	router := gin.Default()
 
-	router.GET("/", func(c *gin.Context) {
-		c.String(http.StatusOK, "Hello, World!")
-	})
+	api := router.Group("/api/v1")
+
+	routes.RegisterRoomRoutes(api)
 
 	router.Run()
 }
