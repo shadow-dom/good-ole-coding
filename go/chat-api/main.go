@@ -116,20 +116,23 @@ func main() {
 
 	router.POST("/upload", uploadHandler)
 
-	// Simple group: v1
+	api := router.Group("/api")
 	{
-		v1 := router.Group("/v1")
-		v1.POST("/login", loginEndpoint)
-		v1.POST("/submit", submitEndpoint)
-		v1.POST("/read", readEndpoint)
-	}
+		// Simple group: v1
+		{
+			v1 := api.Group("/v1")
+			v1.POST("/login", loginEndpoint)
+			v1.POST("/submit", submitEndpoint)
+			v1.POST("/read", readEndpoint)
+		}
 
-	v2 := router.Group("/v2")
-	v2.Use(AuthRequired()) // Apply auth middleware to all v2 routes
-	{
-		v2.POST("/login", loginEndpoint)
-		v2.POST("/submit", submitEndpoint)
-		v2.POST("/read", readEndpoint)
+		v2 := api.Group("/v2")
+		v2.Use(AuthRequired()) // Apply auth middleware to all v2 routes
+		{
+			v2.POST("/login", loginEndpoint)
+			v2.POST("/submit", submitEndpoint)
+			v2.POST("/read", readEndpoint)
+		}
 	}
 
 	router.Run(":8080")
