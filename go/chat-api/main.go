@@ -151,6 +151,38 @@ func uploadHandler(c *gin.Context) {
 	})
 }
 
+// RegisterUserRoutes sets up all /users endpoints.
+func RegisterUserRoutes(rg *gin.RouterGroup) {
+	users := rg.Group("/users")
+	{
+		users.GET("/", listUsers)
+		users.POST("/", createUser)
+		users.GET("/:id", getUser)
+		users.PUT("/:id", updateUser)
+		users.DELETE("/:id", deleteUser)
+	}
+}
+
+// RegisterOrderRoutes sets up all /orders endpoints.
+func RegisterOrderRoutes(rg *gin.RouterGroup) {
+	orders := rg.Group("/orders")
+	{
+		orders.GET("/", listOrders)
+		orders.POST("/", createOrder)
+		orders.GET("/:id", getOrder)
+	}
+}
+
+func listUsers(c *gin.Context)  { c.JSON(http.StatusOK, gin.H{"action": "list_users"}) }
+func createUser(c *gin.Context) { c.JSON(http.StatusCreated, gin.H{"action": "create_user"}) }
+func getUser(c *gin.Context)    { c.JSON(http.StatusOK, gin.H{"action": "get_user"}) }
+func updateUser(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"action": "update_user"}) }
+func deleteUser(c *gin.Context) { c.Status(http.StatusNoContent) }
+
+func listOrders(c *gin.Context)  { c.JSON(http.StatusOK, gin.H{"action": "list_orders"}) }
+func createOrder(c *gin.Context) { c.JSON(http.StatusCreated, gin.H{"action": "create_order"}) }
+func getOrder(c *gin.Context)    { c.JSON(http.StatusOK, gin.H{"action": "get_order"}) }
+
 func main() {
 	router := gin.Default()
 
@@ -296,6 +328,14 @@ func main() {
 		}
 		c.JSON(http.StatusOK, gin.H{"success": true, "data": gin.H{"id": id}})
 	})
+
+	api := router.Group("/api/v1")
+
+	// routes/users.go
+	RegisterUserRoutes(api)
+
+	//routes/orders.go
+	RegisterOrderRoutes(api)
 
 	router.Run(":8080")
 }
