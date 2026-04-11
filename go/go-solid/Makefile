@@ -20,6 +20,8 @@ frontend:
 # Build frontend into dist/ then build Go binary
 build:
 	cd frontend && bun install && bun run build
+	rm -rf backend/frontend/dist
+	cp -r frontend/dist backend/frontend/dist
 	cd backend && go build -o go-solid .
 
 # Build Docker image
@@ -36,3 +38,4 @@ docker-up: docker docker-run
 clean:
 	rm -f backend/go-solid
 	rm -rf backend/frontend/dist
+	rm -rf frontend/dist

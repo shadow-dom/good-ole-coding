@@ -13,7 +13,7 @@ export default defineConfig({
   },
   build: {
     target: 'esnext',
-    outDir: '../backend/frontend/dist',
+    outDir: 'dist',
     emptyOutDir: true,
   },
 });
