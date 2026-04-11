@@ -20,7 +20,11 @@ const Rooms: Component = () => {
           <ul class="space-y-2">
             <For each={rooms()}>
               {(room: any) => (
-                <li class="p-3 border rounded">{room.name ?? JSON.stringify(room)}</li>
+                <li class="p-3 border rounded">
+                  <a href={`/room/${room.id ?? room.name ?? room}`} class="text-blue-600 underline">
+                    {room.name ?? JSON.stringify(room)}
+                  </a>
+                </li>
               )}
             </For>
           </ul>
