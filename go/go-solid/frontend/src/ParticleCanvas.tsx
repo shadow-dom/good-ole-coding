@@ -1,5 +1,6 @@
 import { onMount, onCleanup, createEffect } from 'solid-js';
 import { useTheme } from './theme';
+import { PARTICLE_COUNT } from './App';
 
 interface Particle {
   x: number;
@@ -30,7 +31,6 @@ export default function ParticleCanvas(props: Props) {
   let mouseY = -1000;
 
   const { theme } = useTheme();
-  const PARTICLE_COUNT = 180;
 
   function createParticle(w: number, h: number, colors: string[]): Particle {
     const angle = Math.random() * Math.PI * 2;

@@ -25,8 +25,9 @@ const StarterContent: Component = () => {
               class="w-8 h-8 rounded-full border-2 transition-all duration-300 cursor-pointer hover:scale-125"
               style={{
                 background: t.particleColors[0],
-                "border-color": themeIndex() === i() ? t.text : 'transparent',
-                "box-shadow": themeIndex() === i() ? `0 0 12px ${t.glow}` : 'none',
+                'border-color': themeIndex() === i() ? t.text : 'transparent',
+                'box-shadow':
+                  themeIndex() === i() ? `0 0 12px ${t.glow}` : 'none',
               }}
               title={t.name}
             />
@@ -41,7 +42,7 @@ const StarterContent: Component = () => {
           <h1
             class="text-7xl font-black tracking-tighter mb-2 transition-all duration-300"
             style={{
-              "text-shadow": `0 0 ${20 + intensity() * 40}px ${theme().glow}`,
+              'text-shadow': `0 0 ${20 + intensity() * 40}px ${theme().glow}`,
               transform: `scale(${1 + intensity() * 0.05})`,
             }}
           >
@@ -71,7 +72,7 @@ const StarterContent: Component = () => {
                 style={{
                   width: `${intensity() * 100}%`,
                   background: `linear-gradient(90deg, ${theme().particleColors[0]}, ${theme().particleColors[1]})`,
-                  "box-shadow": `0 0 ${8 + intensity() * 16}px ${theme().glow}`,
+                  'box-shadow': `0 0 ${8 + intensity() * 16}px ${theme().glow}`,
                 }}
               />
             </div>
@@ -82,34 +83,17 @@ const StarterContent: Component = () => {
               <kbd
                 class="inline-block px-2 py-0.5 rounded text-[10px] mr-1.5 border transition-all duration-150"
                 style={{
-                  "border-color": theme().muted + '66',
-                  background: intensity() > 0 ? theme().accent + '22' : 'transparent',
+                  'border-color': theme().muted + '66',
+                  background:
+                    intensity() > 0 ? theme().accent + '22' : 'transparent',
                   color: intensity() > 0 ? theme().accent : theme().muted,
                 }}
               >
                 space
               </kbd>
-              {tapsPerSec()} taps/s &middot; particle velocity {Math.round((1 + intensity() * 5) * 100)}%
+              {tapsPerSec()} taps/s &middot; particle velocity{' '}
+              {Math.round((1 + intensity() * 5) * 100)}%
             </p>
-          </div>
-
-          {/* Feature cards */}
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
-            <FeatureCard
-              icon="⚡"
-              title="Gin API"
-              desc="Fast HTTP with SSE streaming"
-            />
-            <FeatureCard
-              icon="🧩"
-              title="SolidJS"
-              desc="Reactive UI with fine-grained updates"
-            />
-            <FeatureCard
-              icon="🎨"
-              title="Tailwind v4"
-              desc="Utility-first CSS, zero config"
-            />
           </div>
 
           {/* Info toggle */}
@@ -118,13 +102,19 @@ const StarterContent: Component = () => {
               class="text-sm rounded-xl px-6 py-4 backdrop-blur-sm border transition-all duration-700"
               style={{
                 background: theme().accent + '08',
-                "border-color": theme().accent + '22',
+                'border-color': theme().accent + '22',
                 color: theme().muted,
               }}
             >
-              Tap <kbd class="px-1.5 py-0.5 rounded border text-xs" style={{ "border-color": theme().muted + '44' }}>spacebar</kbd> rapidly to accelerate particles.
-              Switch themes with the dots above.
-              Mouse repels nearby particles.
+              Tap{' '}
+              <kbd
+                class="px-1.5 py-0.5 rounded border text-xs"
+                style={{ 'border-color': theme().muted + '44' }}
+              >
+                spacebar
+              </kbd>{' '}
+              rapidly to accelerate particles. Switch themes with the dots
+              above. Mouse repels nearby particles.
               <button
                 onClick={() => setShowInfo(false)}
                 class="ml-3 underline opacity-60 hover:opacity-100 cursor-pointer"
@@ -148,25 +138,7 @@ const StarterContent: Component = () => {
   );
 };
 
-const PARTICLE_COUNT = 180;
-
-const FeatureCard: Component<{ icon: string; title: string; desc: string }> = (props) => {
-  const { theme } = useTheme();
-
-  return (
-    <div
-      class="rounded-xl p-5 border backdrop-blur-sm transition-all duration-500 hover:scale-[1.03]"
-      style={{
-        background: theme().accent + '08',
-        "border-color": theme().accent + '18',
-      }}
-    >
-      <div class="text-2xl mb-2">{props.icon}</div>
-      <h3 class="font-semibold mb-1" style={{ color: theme().accent }}>{props.title}</h3>
-      <p class="text-xs" style={{ color: theme().muted }}>{props.desc}</p>
-    </div>
-  );
-};
+export const PARTICLE_COUNT = 180;
 
 const App: Component = () => {
   return (
