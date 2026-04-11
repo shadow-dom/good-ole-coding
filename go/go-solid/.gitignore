@@ -1,0 +1,14 @@
+# Build output
+backend/go-solid
+backend/frontend/dist/
+
+# Dependencies
+frontend/node_modules/
+
+# Environment
+.env
+.env*.local
+
+# System
+.DS_Store
+Thumbs.db

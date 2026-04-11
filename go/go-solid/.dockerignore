@@ -1,0 +1,6 @@
+frontend/node_modules/
+backend/frontend/dist/
+backend/go-solid
+.git
+.DS_Store
+*.md
